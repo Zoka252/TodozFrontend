@@ -60,3 +60,24 @@ h3{
     }
   }
 }
+.search{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  color: #352f36;
+
+
+  input{
+  }
+  button{
+
+  }
+}
+.dropout{
+  text-decoration: none;
+  color: #352f36;
+}
+a{
+  text-decoration: none;
+}

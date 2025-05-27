@@ -18,9 +18,9 @@
   flex-direction: row;
   gap: 10px;
   font-weight: bold;
+  a{
+    text-decoration: none;
+    color: aliceblue;
+  }
 }
 
-a{
-  text-decoration: none;
-  color: aliceblue;
-}

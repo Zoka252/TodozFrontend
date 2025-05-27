@@ -65,7 +65,20 @@ const handleEdit = (id:number) => {
 
     return (
         <div className={styles.naslov}>
-            <h1>Lista</h1>
+            <div className={styles.search}>
+                <h1>Lista</h1>
+                <form action="">
+                    <form action="/action_page.php">
+                        <input type="text" placeholder="Search.." name="search"/>
+                        <button type="submit"><i className="fa fa-search"></i></button>
+                    </form>
+                </form>
+                <div className={styles.dropout}>
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                    <a href="#">Link 3</a>
+                </div>
+            </div>
             <div className={styles.container}>
                 {taskovi.length === 0 ? (<p>Nema taskova</p>) : (
                     taskovi.map((task => (
