@@ -7,27 +7,41 @@ import ListaTaskova from "./components/ListaTaskova/ListaTaskova";
 import styles from './Styles/App.module.scss'
 import AddTask from "./Pages/AddTask/AddTask";
 import EditTask from "./Pages/EditTask/EditTask";
+import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import Login from "./Pages/Login/Login";
+import AuthWrapper from "./components/Verifikacija";
 
 function App() {
     // @ts-ignore
-    return (
-        <Router>
-            <div className={styles.app} >
-                <Navbar />
-                <div className={styles.content}>
-                    <Sidebar></Sidebar>
-                    <main>
-                        <Routes>
-                            <Route path="/" element={<ListaTaskova/>}/> {/*U ranijim verzijama je bio potreban exact path, od react router v6 ne treba vise}*/}
-                            <Route path="/addTask" element = {<AddTask/>}/>
-                            <Route path="/edit/:id" element = {<EditTask/>}></Route>
-                        </Routes>
-                    </main>
-                </div>
-                <Footer/>
-            </div>
-        </Router>
-    );
-}
+    const navigate = useNavigate();
 
-export default App
+    useEffect(() => {
+        if (!localStorage.getItem('vukan') && window.location.pathname !== '/login') {
+            navigate('/login');
+        }
+    }, [navigate]);
+
+        return (
+            <Router>
+                <AuthWrapper>
+                    <div className={styles.app}>
+                        <Navbar />
+                        <div className={styles.content}>
+                            <main>
+                                <Routes>
+                                    <Route path="/login" element={<Login />} />
+                                    <Route path="/" element={<ListaTaskova />} />
+                                    <Route path="/addTask" element={<AddTask />} />
+                                    <Route path="/edit/:id" element={<EditTask />} />
+                                </Routes>
+                            </main>
+                        </div>
+                        <Footer />
+                    </div>
+                </AuthWrapper>
+            </Router>
+        );
+    }
+
+export default App;
