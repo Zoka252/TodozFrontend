@@ -1,26 +1,33 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import Footer from './components/Footer/Footer';
+import Sidebar from './components/Sidebar/Sidebar';
+import Navbar from './components/Navbar/Navbar';
+import ListaTaskova from "./components/ListaTaskova/ListaTaskova";
+import styles from './Styles/App.module.scss'
+import AddTask from "./Pages/AddTask/AddTask";
+import EditTask from "./Pages/EditTask/EditTask";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    // @ts-ignore
+    return (
+        <Router>
+            <div className={styles.app} >
+                <Navbar />
+                <div className={styles.content}>
+                    <Sidebar></Sidebar>
+                    <main>
+                        <Routes>
+                            <Route path="/" element={<ListaTaskova/>}/> {/*U ranijim verzijama je bio potreban exact path, od react router v6 ne treba vise}*/}
+                            <Route path="/addTask" element = {<AddTask/>}/>
+                            <Route path="/edit/:id" element = {<EditTask/>}></Route>
+                        </Routes>
+                    </main>
+                </div>
+                <Footer/>
+            </div>
+        </Router>
+    );
 }
 
-export default App;
+export default App

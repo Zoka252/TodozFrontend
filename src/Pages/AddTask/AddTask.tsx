@@ -1,0 +1,86 @@
+import styles from './AddTask.module.scss'
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
+
+const AddTask = () => {
+
+const [naslov, setNaslov] = useState('');
+const [opis, setOpis] = useState('');
+const [deskripcija, setDeskripcija] = useState('');
+const [rok, setRok] = useState('');
+const [isPending, setIsPending] = useState(false);
+const now = new Date(); //2025-05-27T13:45:00.000Z
+const minDate = now.toISOString().slice(0, 16);
+const history = useNavigate();
+const [error, setError] = useState('');
+
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!naslov.trim() || !opis.trim() || !rok.trim()) {
+        setError('Naslov opis i rok su obavezni!!!');
+        return;
+    }
+
+    setError('');
+
+    const task = {
+        naslov,
+        opis,
+        kraj:rok,
+        korisnikov_id:5,
+        tip_id:2,
+        izvrsenje:0,
+        deskripcija,
+        napravljeno: new Date().toISOString().slice(0, 16)
+    };
+    console.log(task);
+    setIsPending(true);
+
+    fetch('http://localhost:3001/taskovi', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(task)
+        }).then((res:Response) => {
+           if (!res.ok){
+               throw new Error('Zahtev nije uspreo');
+           }
+           return res.text();
+    })
+        .then(() => {
+            console.log('Radi');
+            setIsPending(false);
+            setNaslov('');
+            setOpis('');
+            setDeskripcija('');
+            setRok('');
+            history(-1);
+        })
+        .catch((err) => {
+            console.log('Slanje taska ne radi',err);
+            setIsPending(false);
+        })
+}
+
+    return (
+        <div className={styles.addTask}>
+            <form onSubmit={handleSubmit}>
+                <label>Naslov</label><br/>
+                <input type="text" value={naslov} onChange={(e) => setNaslov(e.target.value)}/><br/>
+                <label>Opis</label><br/>
+                <input type="text" value={opis} onChange={(e) => setOpis(e.target.value)}/><br/>
+                <label>Deskripcija</label><br/>
+                <textarea value={deskripcija} onChange={(e) => setDeskripcija(e.target.value)}></textarea><br/>
+                <label>Rok</label><br/>
+                <input type="datetime-local" value={rok} onChange={(e) => setRok(e.target.value)} min = {minDate}/><br/>
+                {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
+                {!isPending && <button>Napravi</button>}
+                {isPending && <button disabled>Napravljen!</button>}
+
+            </form>
+        </div>
+    )
+}
+
+export default AddTask;

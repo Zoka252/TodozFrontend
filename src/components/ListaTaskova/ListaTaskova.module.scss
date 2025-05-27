@@ -1,0 +1,62 @@
+.container{
+  padding: 1rem;
+  color: #352f36;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;  // razmak između kartica
+}
+.naslov{
+  padding: 1rem;
+}
+h3{
+  font-weight: lighter;
+}
+.kartica {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s ease;
+  cursor: default;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); // jača senka na hover
+  }}
+
+.dole{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 1rem;
+  button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 0.35rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+
+    &:first-of-type {
+      background-color: #dc3545;  // crveno za 'Obrisi'
+
+      &:hover {
+        background-color: #a71d2a;
+      }
+    }
+  }
+}
