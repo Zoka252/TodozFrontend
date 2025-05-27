@@ -31,23 +31,27 @@ function ListaTaskova() {
     // abort controler koji sluzi da prekine fec u slucaju promene stranice
 
     useEffect(() => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            // Ako nema userId, možda preusmeri na login ili samo prekini fetch
+            return;
+        }
 
-        fetch('http://localhost:3001/taskovi')
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Failed to fetch taskovi');
-                }
-                return res.json();
-            })
-            .then((data: Task[]) => {
-                console.log(data);
-                setTaskova(data);
-                setIsPending(false);
-                setError(null);
-            })
-            .catch((err) => {
+        const fetchTaskovi = async () => {
+            try {
+                const res = await fetch(`http://localhost:3001/taskovi?userId=${userId}`);
+                if (!res.ok) throw new Error('Greška pri dohvatanju taskova');
+                const data = await res.json();
 
-            });
+                // Proveravamo da li je data niz, da ne bi bilo taskovi.map greške
+                setTaskova(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error('Greška:', err);
+                setTaskova([]);
+            }
+        };
+
+        fetchTaskovi();
     }, []);
 
 
@@ -75,11 +79,15 @@ function ListaTaskova() {
     };
 
     const handleSearch = (e:any) => {
-
         e.preventDefault();
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            // možeš dodati neki error ili redirect
+            console.error("Nema userId u localStorage");
+            return;
+        }
 
-
-        fetch(`http://localhost:3001/search?term=${inputValue}` )
+        fetch(`http://localhost:3001/search?term=${inputValue}&userId=${userId}`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error('Failed to fetch taskovi');
@@ -93,15 +101,15 @@ function ListaTaskova() {
                 setError(null);
             })
             .catch((err) => {
-                if (err.name == 'AbortError') {
+                if (err.name === 'AbortError') {
                     console.log('fetch aborted');
                 } else {
                     setIsPending(false);
                     setError(err.message)
                 }
-                ;
             });
     }
+
 
     const handleSortChange = (e:any) => {
         setSelectedOptions(e.target.value);

@@ -1,72 +1,99 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styles from './Login.module.scss';
 
-const Login = () => {
-    const [ime, setIme] = useState('');
+interface LoginProps {
+    onLoginSuccess: (userId: string, username: string) => void;
+}
+
+function Login({ onLoginSuccess }: LoginProps) {
+    const [username, setUsername] = useState('');
     const [sifra, setSifra] = useState('');
     const [error, setError] = useState('');
+    const [showRegisterOption, setShowRegisterOption] = useState(false);
     const navigate = useNavigate();
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-
-        if (!ime.trim() || !sifra.trim()) {
-            setError('Unesite ime i šifru.');
-            return;
-        }
+        setShowRegisterOption(false);
 
         try {
-            // 1. Proveravamo da li korisnik postoji
-            const res = await fetch(`http://localhost:3001/korisnici?ime=${ime}&sifra=${sifra}`);
+            const res = await fetch('http://localhost:3001/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, sifra }),
+            });
+
             const data = await res.json();
 
-            if (data.length > 0) {
-                // Postoji korisnik
-                localStorage.setItem('vukan', data[0].id);
-                navigate('/');
-            } else {
-                // 2. Ne postoji – pravimo novog korisnika
-                const postRes = await fetch('http://localhost:3001/korisnici', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ime, sifra })
-                });
-
-                if (!postRes.ok) throw new Error('Greška prilikom kreiranja korisnika');
-
-                const newUser = await postRes.json();
-                localStorage.setItem('vukan', newUser.id);
-                navigate('/');
+            if (!res.ok) {
+                setError(data.error || 'Greška pri logovanju');
+                if (data.error?.includes('ne postoji')) {
+                    setShowRegisterOption(true);
+                }
+                return;
             }
 
-        } catch (err) {
-            console.error(err);
-            setError('Greška pri loginu.');
+            onLoginSuccess(data.id, username);
+            navigate('/');
+        } catch {
+            setError('Greška pri povezivanju sa serverom');
+        }
+    };
+
+    const handleRegister = async () => {
+        try {
+            const res = await fetch('http://localhost:3001/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, sifra }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.error || 'Greška pri kreiranju naloga');
+                return;
+            }
+
+            onLoginSuccess(data.id, username);
+            navigate('/');
+        } catch {
+            setError('Greška pri povezivanju sa serverom');
         }
     };
 
     return (
-        <div style={{ padding: '2rem' }}>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
+        <div className={styles.loginContainer}>
+            <form onSubmit={handleSubmit} className={styles.form}>
                 <input
                     type="text"
-                    placeholder="Ime"
-                    value={ime}
-                    onChange={(e) => setIme(e.target.value)}
-                /><br />
+                    placeholder="Korisničko ime"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    required
+                />
                 <input
                     type="password"
                     placeholder="Šifra"
                     value={sifra}
-                    onChange={(e) => setSifra(e.target.value)}
-                /><br />
+                    onChange={e => setSifra(e.target.value)}
+                    required
+                />
                 <button type="submit">Prijavi se</button>
+                {error && <p className={styles.error}>{error}</p>}
+                {showRegisterOption && (
+                    <div className={styles.registerPrompt}>
+                        <p>Korisnik ne postoji. Želite da napravite novi nalog?</p>
+                        <button type="button" onClick={handleRegister}>
+                            Kreiraj nalog
+                        </button>
+                    </div>
+                )}
             </form>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
     );
-};
+}
 
 export default Login;

@@ -2,14 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Navbar.module.scss';
 
-const Navbar = () => {
-    return (
+const Navbar = ({ onLogout }: { onLogout: () => void }) => {
+    const username = localStorage.getItem('username');
 
+    return (
         <div className={styles.navbar}>
-            <h2>To-Do App</h2>
-            <div className={styles.links}>
-                <Link to="/">Home</Link>
-                <Link to="/addTask">Novi Task +</Link>
+            <Link to="/"><h2>To-Do App</h2></Link>
+            <div className={styles.username}>
+                {username && (
+                    <div className={styles.userActions}>
+                        <span><strong>{username}</strong></span>
+                        <button onClick={onLogout} className={styles.logoutBtn}>Izloguj se</button>
+                    </div>
+                )}
             </div>
         </div>
     );

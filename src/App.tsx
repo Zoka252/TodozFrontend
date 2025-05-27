@@ -1,47 +1,98 @@
-import React from 'react';
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
+} from 'react-router-dom';
 import Footer from './components/Footer/Footer';
-import Sidebar from './components/Sidebar/Sidebar';
 import Navbar from './components/Navbar/Navbar';
-import ListaTaskova from "./components/ListaTaskova/ListaTaskova";
-import styles from './Styles/App.module.scss'
-import AddTask from "./Pages/AddTask/AddTask";
-import EditTask from "./Pages/EditTask/EditTask";
-import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import Login from "./Pages/Login/Login";
-import AuthWrapper from "./components/Verifikacija";
+import ListaTaskova from './components/ListaTaskova/ListaTaskova';
+import styles from './Styles/App.module.scss';
+import AddTask from './Pages/AddTask/AddTask';
+import EditTask from './Pages/EditTask/EditTask';
+import Login from './Pages/Login/Login';
 
 function App() {
-    // @ts-ignore
-    const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('userId'));
 
     useEffect(() => {
-        if (!localStorage.getItem('vukan') && window.location.pathname !== '/login') {
-            navigate('/login');
-        }
-    }, [navigate]);
+        // Opcionalno prati promene localStorage iz drugih tabova/sesija
+        const onStorageChange = () => {
+            setIsLoggedIn(!!localStorage.getItem('userId'));
+        };
+        window.addEventListener('storage', onStorageChange);
 
-        return (
-            <Router>
-                <AuthWrapper>
-                    <div className={styles.app}>
-                        <Navbar />
-                        <div className={styles.content}>
-                            <main>
-                                <Routes>
-                                    <Route path="/login" element={<Login />} />
-                                    <Route path="/" element={<ListaTaskova />} />
-                                    <Route path="/addTask" element={<AddTask />} />
-                                    <Route path="/edit/:id" element={<EditTask />} />
-                                </Routes>
-                            </main>
-                        </div>
-                        <Footer />
-                    </div>
-                </AuthWrapper>
-            </Router>
-        );
-    }
+        return () => {
+            window.removeEventListener('storage', onStorageChange);
+        };
+    }, []);
+
+    const handleLoginSuccess = (userId: string, username: string) => {
+        localStorage.setItem('userId', userId);
+        localStorage.setItem('username', username);
+        setIsLoggedIn(true);
+    };
+
+    const handleLogout = () => {
+        localStorage.clear();
+        setIsLoggedIn(false);
+    };
+
+    return (
+        <Router>
+            <div className={styles.app}>
+                {isLoggedIn && <Navbar onLogout={handleLogout} />}
+                <div className={styles.content}>
+                    <main>
+                        <Routes>
+                            <Route
+                                path="/login"
+                                element={
+                                    isLoggedIn ? (
+                                        <Navigate to="/" />
+                                    ) : (
+                                        <Login onLoginSuccess={handleLoginSuccess} />
+                                    )
+                                }
+                            />
+                            <Route
+                                path="/"
+                                element={
+                                    isLoggedIn ? (
+                                        <ListaTaskova />
+                                    ) : (
+                                        <Navigate to="/login" />
+                                    )
+                                }
+                            />
+                            <Route
+                                path="/addTask"
+                                element={
+                                    isLoggedIn ? (
+                                        <AddTask />
+                                    ) : (
+                                        <Navigate to="/login" />
+                                    )
+                                }
+                            />
+                            <Route
+                                path="/edit/:id"
+                                element={
+                                    isLoggedIn ? (
+                                        <EditTask />
+                                    ) : (
+                                        <Navigate to="/login" />
+                                    )
+                                }
+                            />
+                        </Routes>
+                    </main>
+                </div>
+                {isLoggedIn && <Footer />}
+            </div>
+        </Router>
+    );
+}
 
 export default App;
