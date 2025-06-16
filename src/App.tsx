@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     BrowserRouter as Router,
     Routes,
@@ -18,7 +18,6 @@ function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('userId'));
 
     useEffect(() => {
-        // Opcionalno prati promene localStorage iz drugih tabova/sesija
         const onStorageChange = () => {
             setIsLoggedIn(!!localStorage.getItem('userId'));
         };
@@ -43,7 +42,7 @@ function App() {
     return (
         <Router>
             <div className={styles.app}>
-                {isLoggedIn && <Navbar onLogout={handleLogout} />}
+                {isLoggedIn && <Navbar onLogout={handleLogout}/>}
                 <div className={styles.content}>
                     <main>
                         <Routes>
@@ -51,9 +50,9 @@ function App() {
                                 path="/login"
                                 element={
                                     isLoggedIn ? (
-                                        <Navigate to="/" />
+                                        <Navigate to="/"/>
                                     ) : (
-                                        <Login onLoginSuccess={handleLoginSuccess} />
+                                        <Login onLoginSuccess={handleLoginSuccess}/>
                                     )
                                 }
                             />
@@ -61,9 +60,9 @@ function App() {
                                 path="/"
                                 element={
                                     isLoggedIn ? (
-                                        <ListaTaskova />
+                                        <ListaTaskova/>
                                     ) : (
-                                        <Navigate to="/login" />
+                                        <Navigate to="/login"/>
                                     )
                                 }
                             />
@@ -71,9 +70,9 @@ function App() {
                                 path="/addTask"
                                 element={
                                     isLoggedIn ? (
-                                        <AddTask />
+                                        <AddTask/>
                                     ) : (
-                                        <Navigate to="/login" />
+                                        <Navigate to="/login"/>
                                     )
                                 }
                             />
@@ -81,22 +80,21 @@ function App() {
                                 path="/edit/:id"
                                 element={
                                     isLoggedIn ? (
-                                        <EditTask />
+                                        <EditTask/>
                                     ) : (
-                                        <Navigate to="/login" />
+                                        <Navigate to="/login"/>
                                     )
                                 }
                             />
-                            <Route path="/detalji/:id" element={<DetaljiTask />} />
+                            <Route path="/detalji/:id" element={<DetaljiTask/>}/>
                         </Routes>
                     </main>
                 </div>
-                {isLoggedIn && <Footer />}
+                {isLoggedIn && <Footer/>}
             </div>
         </Router>
     );
 }
-
 
 
 export default App;

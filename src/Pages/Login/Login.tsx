@@ -25,11 +25,17 @@ function Login({ onLoginSuccess }: LoginProps) {
                 body: JSON.stringify({ username, sifra }),
             });
 
-            const data = await res.json();
+            let data;
+            if (res.ok) {
+                data = await res.json();
+            } else {
+                const text = await res.text();
+                data = { error: text };
+            }
 
             if (!res.ok) {
                 setError(data.error || 'Greška pri logovanju');
-                if (data.error?.includes('ne postoji')) {
+                if (data.error.toLowerCase().includes('ne postoji')) {
                     setShowRegisterOption(true);
                 }
                 return;

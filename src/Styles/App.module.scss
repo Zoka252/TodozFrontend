@@ -1,9 +1,12 @@
 .app {
   padding-top: 55px;
+  margin: 0px 20px;
   //margin-left: 250px;
   min-height: 100vh;
-  margin: 0px 20px;
 }
-
+.loginPage {
+  padding-top: 0 !important;
+  margin: 0 !important;
+}
 .content {
 }

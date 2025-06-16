@@ -122,9 +122,9 @@ function ListaTaskova() {
             });
     };
 
-    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedOptions(e.target.value);
-    };
+    // const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    //     setSelectedOptions(e.target.value);
+    // };
 
     return (
         <div className={styles.naslov}>
