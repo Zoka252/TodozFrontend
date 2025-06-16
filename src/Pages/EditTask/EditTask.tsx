@@ -30,7 +30,7 @@ const EditTask = () => {
     const [deskripcija, setDeskripcija] = useState('');
     const [rok, setRok] = useState('');
 
-    // Pomoćna funkcija za ispravan format datuma za input datetime-local
+    // Formatiranje datuma za datetime-local input
     const formatDateTimeLocal = (dateString: string) => {
         const date = new Date(dateString);
         const off = date.getTimezoneOffset();
@@ -39,7 +39,6 @@ const EditTask = () => {
     };
 
     useEffect(() => {
-        const abortCont = new AbortController();
 
         if (!id) {
             setError('Nije pronađen ID zadatka.');
@@ -47,9 +46,7 @@ const EditTask = () => {
             return;
         }
 
-        console.log("Fetching task with id:", id);
-
-        fetch(`http://localhost:3001/taskovi/${id}`, { signal: abortCont.signal })
+        fetch(`http://localhost:3001/taskovi/${id}`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`Neuspešno dobavljanje taska, status: ${res.status}`);
@@ -57,11 +54,9 @@ const EditTask = () => {
                 return res.json();
             })
             .then((data: Task | Task[]) => {
-                console.log("Task data from backend:", data);
                 const taskData = Array.isArray(data) ? data[0] : data;
-                if (!taskData) {
-                    throw new Error('Task nije pronađen');
-                }
+                if (!taskData) throw new Error('Task nije pronađen');
+
                 setTask(taskData);
                 setNaslov(taskData.naslov);
                 setOpis(taskData.opis || '');
@@ -74,12 +69,11 @@ const EditTask = () => {
                 if (err.name === 'AbortError') {
                     console.log('Zahtev prekinut');
                 } else {
-                    setIsPending(false);
                     setError(err.message);
+                    setIsPending(false);
                 }
             });
 
-        return () => abortCont.abort();
     }, [id]);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -92,16 +86,21 @@ const EditTask = () => {
 
         setError(null);
 
+        if (!task) {
+            setError('Task nije učitan.');
+            return;
+        }
+
         const updatedTask: Task = {
-            id: task?.id || 0,
+            id: task.id,
             naslov,
             opis,
-            kraj: new Date(rok).toISOString(),  // backend uglavnom voli ISO
-            korisnikov_id: task?.korisnikov_id || 5,
-            tip_id: task?.tip_id || 2,
-            izvrsenje: task?.izvrsenje || 0,
+            kraj: new Date(rok).toISOString(),
+            korisnikov_id: task.korisnikov_id,
+            tip_id: task.tip_id,
+            izvrsenje: task.izvrsenje,
             deskripcija,
-            napravljeno: task?.napravljeno || new Date().toISOString(),
+            napravljeno: task.napravljeno,
         };
 
         setIsPending(true);
@@ -112,20 +111,41 @@ const EditTask = () => {
             body: JSON.stringify(updatedTask),
         })
             .then(res => {
-                if (!res.ok) {
-                    throw new Error(`Greška pri ažuriranju taska, status: ${res.status}`);
-                }
+                if (!res.ok) throw new Error(`Greška pri ažuriranju taska, status: ${res.status}`);
                 return res.text();
             })
             .then(() => {
-                console.log('Task uspešno ažuriran');
                 setIsPending(false);
-                navigate(-1);  // vraća nazad
+                navigate(-1);
             })
             .catch(err => {
-                console.error('Slanje ne radi', err);
                 setIsPending(false);
                 setError('Došlo je do greške pri čuvanju.');
+                console.error(err);
+            });
+    };
+
+    const handleMarkAsDone = () => {
+        if (!task || task.izvrsenje === 1) return;
+
+        const updatedTask = { ...task, izvrsenje: 1 };
+
+        fetch(`http://localhost:3001/taskovi/${task.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedTask),
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Greška prilikom označavanja taska kao završenog.');
+                return res.text();
+            })
+            .then(() => {
+                setTask(prev => prev ? { ...prev, izvrsenje: 1 } : prev);
+                alert('Zadatak je označen kao završen.');
+            })
+            .catch(err => {
+                alert('Greška pri ažuriranju.');
+                console.error(err);
             });
     };
 
@@ -160,8 +180,17 @@ const EditTask = () => {
                         min={minDate}
                         required
                     /><br />
-                    {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
-                    {!isPending && <button type="submit">Izmeni</button>}
+                    <button
+                        type="button"
+                        className={styles.oznaci}
+                        onClick={handleMarkAsDone}
+                        disabled={task?.izvrsenje === 1}
+                    >
+                        {task?.izvrsenje === 1 ? 'Već označen kao završen' : 'Označi kao završen'}
+                    </button>
+                    <br />
+                    {error && <p style={{ color: 'red', marginBottom: '1rem' , }}>{error}</p>}
+                    {!isPending && <button type="submit" style={{marginTop:'10px'}}>Izmeni</button>}
                     {isPending && <button disabled>Čuvanje...</button>}
                 </form>
             </div>

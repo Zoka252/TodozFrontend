@@ -4,6 +4,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0;
+  padding: 0;
 
   .form {
     background: white;
@@ -24,12 +26,12 @@
 
       &:focus {
         outline: none;
-        border-color: #4caf50;
+        border-color: #ffd700;
       }
     }
 
     button {
-      background-color: #4caf50;
+      background-color: #ffd700;
       color: white;
       padding: 0.75rem;
       border: none;
@@ -39,7 +41,7 @@
       transition: background-color 0.2s;
 
       &:hover {
-        background-color: #43a047;
+        background-color: #0056b3;
       }
     }
 

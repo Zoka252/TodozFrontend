@@ -12,6 +12,7 @@ import styles from './Styles/App.module.scss';
 import AddTask from './Pages/AddTask/AddTask';
 import EditTask from './Pages/EditTask/EditTask';
 import Login from './Pages/Login/Login';
+import DetaljiTask from "./Pages/Detalji/Detalji";
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('userId'));
@@ -86,6 +87,7 @@ function App() {
                                     )
                                 }
                             />
+                            <Route path="/detalji/:id" element={<DetaljiTask />} />
                         </Routes>
                     </main>
                 </div>
@@ -94,5 +96,7 @@ function App() {
         </Router>
     );
 }
+
+
 
 export default App;

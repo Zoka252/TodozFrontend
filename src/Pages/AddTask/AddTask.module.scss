@@ -8,6 +8,35 @@
   background-color: #f9f9f9;
   height: 1100px;
 
+  .oznaci{
+    padding: 10px;
+  }
+
+.dugmad {
+  display: flex;
+  button {
+    background-color: #ffd700;
+    border: none;
+    color: white;
+    padding: 0.35rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+
+    &:first-of-type {
+      background-color: #dc3545; // crveno za 'Obrisi'
+
+      &:hover {
+        background-color: #a71d2a;
+      }
+    }
+  }
+}
   form {
     background-color: #fff;
     padding: 2rem 2.5rem;

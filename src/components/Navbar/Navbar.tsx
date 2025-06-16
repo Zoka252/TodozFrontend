@@ -12,12 +12,11 @@ const Navbar = ({ onLogout }: { onLogout: () => void }) => {
                 {username && (
                     <div className={styles.userActions}>
                         <span><strong>{username}</strong></span>
-                        <button onClick={onLogout} className={styles.logoutBtn}>Izloguj se</button>
+                        <button onClick={onLogout} className={styles.logoutBtn}>Odjavi se</button>
                     </div>
                 )}
             </div>
         </div>
     );
 };
-
 export default Navbar;
